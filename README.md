@@ -1,16 +1,7 @@
 # ELTA Registro de Entregas
 
-Proyecto Android listo para compilar APK con GitHub Actions.
+Versión estable para compilar APK en GitHub Actions.
 
-## Estructura correcta
+## Compilar
 
-- `.github/workflows/build-apk.yml`
-- `app/src/main/AndroidManifest.xml`
-- `app/src/main/java/com/elta/entregas/MainActivity.kt`
-- `app/build.gradle`
-- `build.gradle`
-- `settings.gradle`
-
-## Generar APK
-
-Entrar en GitHub > Actions > Build APK > Run workflow.
+GitHub > Actions > Build APK > Run workflow.
