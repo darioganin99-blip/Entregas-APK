@@ -42,7 +42,7 @@ function renderStep(){
   const u = user();
 
   if(step===1){
-    $("stepTitle").innerText="Entrega ( Flota - Chofer )";
+    $("stepTitle").innerText="Paso 1";
     $("stepContent").innerHTML=`
       <div class="unifiedUserBox">
         <b>${(u.fleet || "Sin flota") + " " + (u.driver || "Sin chofer")}</b>
@@ -53,7 +53,7 @@ function renderStep(){
   }
 
   if(step===2){
-    $("stepTitle").innerText="Destino GPS · Fecha y Hora";
+    $("stepTitle").innerText="Paso 2";
     const gps = state.gps;
     const list = nearbyOptions();
     const opts = list.map((d,i)=>`<option value="${i}">${d.name} · ${Number(d.km || 0).toFixed(2)} km</option>`).join("");
@@ -76,7 +76,7 @@ function renderStep(){
   }
 
   if(step===3){
-    $("stepTitle").innerText="Ingresar Número de Lote/Carga";
+    $("stepTitle").innerText="Paso 3";
     $("stepContent").innerHTML=`
       <label>Lote / Carga</label>
       <input id="lote" inputmode="numeric" value="${state.lote}" placeholder="Ej: 1223">
@@ -86,7 +86,7 @@ function renderStep(){
   }
 
   if(step===4){
-    $("stepTitle").innerText="Ingresar Unidades";
+    $("stepTitle").innerText="Paso 4";
     $("stepContent").innerHTML=`
       <p class="stepHint">Este paso es opcional. Podés continuar solo con lote o cargar uno o más VIN.</p>
       <label>VIN</label>
@@ -102,12 +102,19 @@ function renderStep(){
   }
 
   if(step===5){
-    $("stepTitle").innerText="Generar y enviar por WhatsApp";
+    $("stepTitle").innerText="Paso 5";
     const msg = buildMessage(false);
     $("stepContent").innerHTML=`
       <div class="summary">${escapeHtml(msg)}</div>
       <button class="btn" onclick="sendWhatsapp()">Enviar por WhatsApp</button>\n      <div class="stepActions"><button class="btn back" onclick="previousStep()">Volver</button><button class="btn light" onclick="step=1;renderStep()">Inicio</button></div>`;
   }
+}
+
+function destinoDireccion(destino){
+  if(!destino) return "";
+  if(destino.address) return destino.address;
+  const parts = String(destino.name || "").split(/\s+-\s+|\s+·\s+/).map(x=>x.trim()).filter(Boolean);
+  return parts.length > 1 ? parts.slice(1).join(" · ") : "";
 }
 
 function destinoCodigo(nombre){
@@ -129,8 +136,9 @@ function destinoNombrePrincipal(nombre){
 function renderDestinoEntrega(){
   if(!state.destino) return "";
   const nombre = destinoNombrePrincipal(state.destino.name);
+  const direccion = destinoDireccion(state.destino);
   const zona = destinoZona(state.destino.name);
-  const codigo = destinoCodigo(state.destino.name);
+  const codigo = state.destino.code || destinoCodigo(state.destino.name);
   const codigoTxt = codigo ? `Código: ${codigo}` : "";
   const zonaTxt = zona ? `${codigoTxt ? " · " : ""}${zona}` : "";
   const meta = `${codigoTxt}${zonaTxt}`;
@@ -139,6 +147,7 @@ function renderDestinoEntrega(){
     <div class="destinoEntregaCard">
       <div class="destLabel">Destino de entrega seleccionado:</div>
       <div class="destName">${nombre}</div>
+      ${direccion ? `<div class="destAddress">${direccion}</div>` : ""}
       <div class="destMeta">${meta}</div>
       <div class="destMeta">${distancia}</div>
     </div>`;
@@ -236,7 +245,7 @@ Chofer: ${u.driver}
 Flota: ${u.fleet}
 Fecha entrega: ${gps ? fmtDate(gps.time) : fmtDate(new Date())}
 Lote: ${state.lote}
-Destino: ${state.destino ? state.destino.name : ""}
+Destino: ${state.destino ? state.destino.name : ""}\nDirección destino: ${state.destino ? destinoDireccion(state.destino) : ""}
 GPS: ${gps ? gps.lat.toFixed(6)+", "+gps.lng.toFixed(6)+" · precisión "+Math.round(gps.acc)+" m · Fecha/hora: "+fmtDate(gps.time) : ""}
 ${unidades}
 Observación general: ${state.obs || "Sin observaciones"}`;
