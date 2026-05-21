@@ -35,11 +35,15 @@ function renderStep(){
   const u = user();
 
   if(step===1){
-    $("stepTitle").innerText="Confirmar Entrega";
+    $("stepTitle").innerText="Entrega";
     $("stepContent").innerHTML=`
       <div class="statgrid">
-        <div class="stat"><b>${u.fleet || "Sin flota"}</b><br><span class="small">Flota</span></div>
-        <div class="stat"><b>${u.driver || "Sin chofer"}</b><br><span class="small">Chofer</span></div>
+        <div class="stat">
+          <div class="compactInfo">
+            Flota: <b>${u.fleet || "Sin flota"}</b><br>
+            Chofer: <b>${u.driver || "Sin chofer"}</b>
+          </div>
+        </div>
       </div>
       <p class="stepHint">Validar que la flota y el chofer sean correctos antes de registrar la entrega.</p>
       <button class="btn" onclick="validateUserAndNext()">Validar datos</button>
