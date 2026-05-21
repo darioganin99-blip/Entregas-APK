@@ -12,7 +12,10 @@ function user(){ return load(LS.user,{fleet:"",driver:"",phone:""}); }
 function fmtDate(d){ return new Date(d).toLocaleString("es-AR"); }
 function regId(){ const d=new Date(); return "ELTA-"+d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0")+"-"+String(d.getHours()).padStart(2,"0")+String(d.getMinutes()).padStart(2,"0")+String(d.getSeconds()).padStart(2,"0"); }
 
-fetch("destinos.json").then(r=>r.json()).then(j=>{destinos=j; renderStep();}).catch(()=>{destinos=[]; renderStep();});
+fetch("destinos.json")
+  .then(r=>r.json())
+  .then(j=>{destinos=Array.isArray(j)?j:[]; renderStep();})
+  .catch(()=>{destinos=[]; renderStep();});
 
 function show(id){
   ["entrega","usuario","ultimo"].forEach(s=>$(s).classList.toggle("hidden",s!==id));
@@ -30,6 +33,7 @@ function setProgress(){
 function renderStep(){
   setProgress();
   const u = user();
+
   if(step===1){
     $("stepTitle").innerText="Confirmar Entrega";
     $("stepContent").innerHTML=`
@@ -37,15 +41,18 @@ function renderStep(){
         <div class="stat"><b>${u.fleet || "Sin flota"}</b><br><span class="small">Flota</span></div>
         <div class="stat"><b>${u.driver || "Sin chofer"}</b><br><span class="small">Chofer</span></div>
       </div>
-      <p class="small">Validar que la flota y el chofer sean correctos antes de registrar la entrega.</p>
+      <p class="stepHint">Validar que la flota y el chofer sean correctos antes de registrar la entrega.</p>
       <button class="btn" onclick="validateUserAndNext()">Validar datos</button>
       <button class="btn light" onclick="show('usuario')">Editar usuario</button>`;
   }
+
   if(step===2){
     $("stepTitle").innerText="Destino GPS · Fecha y Hora";
     const gps = state.gps;
-    const opts = nearbyOptions().map((d,i)=>`<option value="${i}">${d.name} · ${d.km.toFixed(2)} km</option>`).join("");
+    const list = nearbyOptions();
+    const opts = list.map((d,i)=>`<option value="${i}">${d.name} · ${Number(d.km || 0).toFixed(2)} km</option>`).join("");
     $("stepContent").innerHTML=`
+      <p class="stepHint">Al validar GPS se calcula automáticamente el destino más cercano usando las coordenadas cargadas.</p>
       <label>Fecha y hora</label>
       <input readonly value="${gps ? fmtDate(gps.time) : ""}" placeholder="Se registra al validar GPS">
       <label>GPS</label>
@@ -53,11 +60,14 @@ function renderStep(){
       <button class="btn secondary" onclick="getGps()">Validar ubicación con GPS</button>
       <label>Destino más cercano</label>
       <input readonly value="${state.destino ? state.destino.name : ""}" placeholder="Se calcula con GPS">
-      <label>Cambiar destino cercano / listado</label>
-      <select id="destSelect">${opts || destinos.map((d,i)=>`<option value="${i}">${d.name}</option>`).join("")}</select>
+      <div class="destInfo">${state.destino && state.destino.km != null ? 'Distancia aproximada: '+Number(state.destino.km).toFixed(2)+' km' : ''}</div>
+      <label>Destinos cercanos</label>
+      <select id="destSelect">${opts || '<option value="">Validá GPS para ver destinos cercanos</option>'}</select>
+      <p class="debugDest">Destinos cargados: ${destinos.length}. Se muestran destinos dentro de 5 km; si no hay, los 10 más cercanos.</p>
       <button class="btn light" onclick="selectDestino()">Usar destino seleccionado</button>
       <button class="btn" onclick="nextFromGps()">Continuar</button>`;
   }
+
   if(step===3){
     $("stepTitle").innerText="Ingresar Número de Lote/Carga";
     $("stepContent").innerHTML=`
@@ -67,10 +77,11 @@ function renderStep(){
       <div id="scannerBox" class="hidden"><video id="video" muted playsinline></video><button class="btn light" onclick="stopScanner()">Cerrar cámara</button></div>
       <button class="btn" onclick="saveLote()">Validar lote</button>`;
   }
+
   if(step===4){
     $("stepTitle").innerText="Ingresar Unidades";
     $("stepContent").innerHTML=`
-      <p class="small">Este paso es opcional. Podés continuar solo con lote o cargar uno o más VIN.</p>
+      <p class="stepHint">Este paso es opcional. Podés continuar solo con lote o cargar uno o más VIN.</p>
       <label>VIN</label>
       <input id="vin" placeholder="Ingresar VIN o escanear">
       <button class="btn secondary" onclick="startScanner('vin')">Escanear VIN</button>
@@ -82,6 +93,7 @@ function renderStep(){
       <textarea id="obs">${state.obs || "Sin observaciones"}</textarea>
       <button class="btn" onclick="saveUnits()">Continuar</button>`;
   }
+
   if(step===5){
     $("stepTitle").innerText="Generar y enviar por WhatsApp";
     const msg = buildMessage(false);
@@ -101,11 +113,12 @@ function validateUserAndNext(){
 function getGps(){
   if(!navigator.geolocation){ alert("GPS no disponible."); return; }
   navigator.geolocation.getCurrentPosition(pos=>{
-    state.gps={lat:pos.coords.latitude,lng:pos.coords.longitude,acc:pos.coords.accuracy,time:new Date().toISOString()};
+    state.gps={lat:pos.coords.latitude,lng:pos.coords.longitude,acc:pos.coords.accuracy || 0,time:new Date().toISOString()};
     const nearest = nearestDestino(state.gps.lat,state.gps.lng);
     if(nearest) state.destino = nearest;
+    else alert("No hay destinos cargados para calcular cercanía.");
     renderStep();
-  }, err=>alert("No se pudo obtener GPS: "+err.message), {enableHighAccuracy:true,timeout:15000,maximumAge:0});
+  }, err=>alert("No se pudo obtener GPS: "+err.message), {enableHighAccuracy:true,timeout:20000,maximumAge:0});
 }
 
 function distKm(a,b,c,d){
@@ -115,21 +128,29 @@ function distKm(a,b,c,d){
   return R*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s));
 }
 
+function cleanDestinos(){
+  return destinos
+    .map(d => ({...d, lat:Number(d.lat), lng:Number(d.lng)}))
+    .filter(d => Number.isFinite(d.lat) && Number.isFinite(d.lng));
+}
+
 function nearestDestino(lat,lng){
-  if(!destinos.length) return null;
-  return destinos.map(d=>({...d,km:distKm(lat,lng,d.lat,d.lng)})).sort((a,b)=>a.km-b.km)[0];
+  const clean = cleanDestinos();
+  if(!clean.length) return null;
+  return clean.map(d=>({...d,km:distKm(lat,lng,d.lat,d.lng)})).sort((a,b)=>a.km-b.km)[0];
 }
 
 function nearbyOptions(){
-  if(!state.gps || !destinos.length) return [];
-  const list=destinos.map(d=>({...d,km:distKm(state.gps.lat,state.gps.lng,d.lat,d.lng)})).filter(d=>d.km<=5).sort((a,b)=>a.km-b.km);
-  return list.length ? list : destinos.map(d=>({...d,km:distKm(state.gps.lat,state.gps.lng,d.lat,d.lng)})).sort((a,b)=>a.km-b.km).slice(0,10);
+  if(!state.gps) return [];
+  const all = cleanDestinos().map(d=>({...d,km:distKm(state.gps.lat,state.gps.lng,d.lat,d.lng)})).sort((a,b)=>a.km-b.km);
+  const within5 = all.filter(d=>d.km<=5);
+  return within5.length ? within5 : all.slice(0,10);
 }
 
 function selectDestino(){
   const idx = Number($("destSelect").value);
   const list = nearbyOptions();
-  state.destino = list[idx] || destinos[idx] || state.destino;
+  if(Number.isFinite(idx) && list[idx]) state.destino = list[idx];
   renderStep();
 }
 
@@ -189,6 +210,7 @@ function sendWhatsapp(){
 function resendLast(){
   const last=load(LS.last,null), u=user();
   if(!last){ alert("No hay último registro."); return; }
+  if(!u.phone){ alert("Cargá el teléfono en Usuario."); show("usuario"); return; }
   window.location.href=`https://wa.me/${u.phone}?text=${encodeURIComponent(last.msg)}`;
 }
 
