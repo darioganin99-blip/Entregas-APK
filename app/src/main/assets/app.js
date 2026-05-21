@@ -112,8 +112,14 @@ function renderStep(){
 
 function validateUserAndNext(){
   const u=user();
-  if(!u.fleet || !u.driver || !u.phone){ alert("Completá Flota, Chofer y WhatsApp en Usuario."); show("usuario"); return; }
-  step=2; renderStep();
+  if(!u.fleet || !u.driver || !u.phone){
+    alert("Completá Flota, Chofer y WhatsApp en Usuario.");
+    show("usuario");
+    return;
+  }
+  show("entrega");
+  step = 2;
+  renderStep();
 }
 
 function getGps(){
