@@ -138,3 +138,43 @@ video{width:100%;border-radius:18px;background:#000;margin-top:12px}
 @media(max-width:360px){
   .unifiedUserBox b{font-size:14px}
 }
+
+
+/* V7 - Campo unico Flota .- Chofer */
+.userLine,
+.statgrid{
+  display:none !important;
+}
+.unifiedUserBox{
+  width:100%;
+  background:#FFFFFF;
+  border:1px solid var(--green);
+  border-radius:16px;
+  min-height:52px;
+  height:52px;
+  padding:8px 12px;
+  display:flex !important;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 8px 16px rgba(0,155,78,.10);
+  margin-top:12px;
+  margin-bottom:8px;
+}
+.unifiedUserBox b{
+  font-size:16px;
+  color:#17212B;
+  font-weight:950;
+  line-height:1.15;
+  text-align:center;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+}
+.topbar span:last-child{
+  font-size:12px;
+  font-weight:900;
+}
+@media(max-width:360px){
+  .unifiedUserBox b{font-size:14px}
+}

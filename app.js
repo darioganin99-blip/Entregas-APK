@@ -37,17 +37,10 @@ function renderStep(){
   if(step===1){
     $("stepTitle").innerText="Entrega";
     $("stepContent").innerHTML=`
-      <div class="userLine">
-        <div class="userBox">
-          <span>Flota</span>
-          <b>${u.fleet || "Sin flota"}</b>
-        </div>
-        <div class="userBox">
-          <span>Chofer</span>
-          <b>${u.driver || "Sin chofer"}</b>
-        </div>
+      <div class="unifiedUserBox">
+        <b>${u.fleet || "Sin flota"} .- ${u.driver || "Sin chofer"}</b>
       </div>
-      <p class="stepHint">Validar que la flota y el chofer sean correctos antes de registrar la entrega.</p>
+      <p class="stepHint">Validar la flota antes de registrar la entrega.</p>
       <button class="btn" onclick="validateUserAndNext()">Validar datos</button>
       <button class="btn light" onclick="show('usuario')">Editar usuario</button>`;
   }
@@ -111,9 +104,9 @@ function renderStep(){
 }
 
 function validateUserAndNext(){
-  const u=user();
-  if(!u.fleet || !u.driver || !u.phone){
-    alert("Completá Flota, Chofer y WhatsApp en Usuario.");
+  const u = user();
+  if(!u.fleet){
+    alert("Completá la Flota en Usuario.");
     show("usuario");
     return;
   }
