@@ -221,11 +221,3 @@ video{width:100%;border-radius:18px;background:#000;margin-top:12px}
   .destinoEntregaCard .destName{font-size:17px}
   .destinoEntregaCard .destMeta{font-size:16px}
 }
-
-
-.destAddress{
-  font-size:16px;
-  font-weight:600;
-  color:#2E7D32;
-  margin-top:3px;
-}
