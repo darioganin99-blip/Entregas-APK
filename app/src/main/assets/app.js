@@ -38,9 +38,9 @@ function renderStep(){
     $("stepTitle").innerText="Entrega";
     $("stepContent").innerHTML=`
       <div class="unifiedUserBox">
-        <b>${u.fleet || "Sin flota"} .- ${u.driver || "Sin chofer"}</b>
+        <b>${(u.fleet || "Sin flota") + " " + (u.driver || "Sin chofer")}</b>
       </div>
-      <p class="stepHint">Validar la flota antes de registrar la entrega.</p>
+      <p class="stepHint">Validar el usuario guardado antes de registrar la entrega.</p>
       <button class="btn" onclick="validateUserAndNext()">Validar datos</button>
       <button class="btn light" onclick="show('usuario')">Editar usuario</button>`;
   }
@@ -105,8 +105,9 @@ function renderStep(){
 
 function validateUserAndNext(){
   const u = user();
-  if(!u.fleet){
-    alert("Completá la Flota en Usuario.");
+  const usuarioGuardado = !!(u.fleet && u.driver && u.phone);
+  if(!usuarioGuardado){
+    alert("Primero guardá el usuario con Flota, Chofer y WhatsApp.");
     show("usuario");
     return;
   }
