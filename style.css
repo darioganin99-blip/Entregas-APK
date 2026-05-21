@@ -178,3 +178,46 @@ video{width:100%;border-radius:18px;background:#000;margin-top:12px}
 @media(max-width:360px){
   .unifiedUserBox b{font-size:14px}
 }
+
+
+/* V9 - destino entrega y volver */
+.destinoEntregaCard{
+  background:#E9FBEF;
+  border:1.5px solid #8FD19E;
+  border-radius:14px;
+  padding:14px 16px;
+  margin-top:10px;
+  color:#2E7D32;
+  line-height:1.22;
+}
+.destinoEntregaCard .destLabel{
+  font-size:17px;
+  font-weight:800;
+  margin-bottom:4px;
+}
+.destinoEntregaCard .destName{
+  font-size:19px;
+  font-weight:950;
+  text-transform:uppercase;
+  margin-bottom:4px;
+}
+.destinoEntregaCard .destMeta{
+  font-size:17px;
+  font-weight:500;
+}
+.btn.back{
+  background:#EEF2F7;
+  color:#17212B;
+  box-shadow:none;
+  border:1px solid #CBD5E1;
+}
+.stepActions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+@media(max-width:420px){
+  .destinoEntregaCard .destLabel{font-size:16px}
+  .destinoEntregaCard .destName{font-size:17px}
+  .destinoEntregaCard .destMeta{font-size:16px}
+}

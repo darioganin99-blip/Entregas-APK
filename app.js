@@ -17,6 +17,13 @@ fetch("destinos.json")
   .then(j=>{destinos=Array.isArray(j)?j:[]; renderStep();})
   .catch(()=>{destinos=[]; renderStep();});
 
+function previousStep(){
+  if(step > 1){
+    step = step - 1;
+    renderStep();
+  }
+}
+
 function show(id){
   ["entrega","usuario","ultimo"].forEach(s=>$(s).classList.toggle("hidden",s!==id));
   ["btn-entrega","btn-usuario","btn-ultimo"].forEach(b=>$(b).classList.remove("active"));
@@ -51,20 +58,21 @@ function renderStep(){
     const list = nearbyOptions();
     const opts = list.map((d,i)=>`<option value="${i}">${d.name} · ${Number(d.km || 0).toFixed(2)} km</option>`).join("");
     $("stepContent").innerHTML=`
-      <p class="stepHint">Al validar GPS se calcula automáticamente el destino más cercano usando las coordenadas cargadas.</p>
+      <p class="stepHint">Al validar GPS se calcula automáticamente el destino de entrega usando las coordenadas cargadas.</p>
       <label>Fecha y hora</label>
       <input readonly value="${gps ? fmtDate(gps.time) : ""}" placeholder="Se registra al validar GPS">
       <label>GPS</label>
       <input readonly value="${gps ? gps.lat.toFixed(6)+', '+gps.lng.toFixed(6)+' · precisión '+Math.round(gps.acc)+' m' : ""}" placeholder="Sin GPS">
       <button class="btn secondary" onclick="getGps()">Validar ubicación con GPS</button>
-      <label>Destino más cercano</label>
-      <input readonly value="${state.destino ? state.destino.name : ""}" placeholder="Se calcula con GPS">
-      <div class="destInfo">${state.destino && state.destino.km != null ? 'Distancia aproximada: '+Number(state.destino.km).toFixed(2)+' km' : ''}</div>
-      <label>Destinos cercanos</label>
+      ${renderDestinoEntrega()}
+      <label>Cambiar destino de entrega</label>
       <select id="destSelect">${opts || '<option value="">Validá GPS para ver destinos cercanos</option>'}</select>
       <p class="debugDest">Destinos cargados: ${destinos.length}. Se muestran destinos dentro de 5 km; si no hay, los 10 más cercanos.</p>
       <button class="btn light" onclick="selectDestino()">Usar destino seleccionado</button>
-      <button class="btn" onclick="nextFromGps()">Continuar</button>`;
+      <div class="stepActions">
+        <button class="btn back" onclick="previousStep()">Volver</button>
+        <button class="btn" onclick="nextFromGps()">Continuar</button>
+      </div>`;
   }
 
   if(step===3){
@@ -74,7 +82,7 @@ function renderStep(){
       <input id="lote" inputmode="numeric" value="${state.lote}" placeholder="Ej: 1223">
       <button class="btn secondary" onclick="startScanner('lote')">Escanear código de barras</button>
       <div id="scannerBox" class="hidden"><video id="video" muted playsinline></video><button class="btn light" onclick="stopScanner()">Cerrar cámara</button></div>
-      <button class="btn" onclick="saveLote()">Validar lote</button>`;
+      <div class="stepActions"><button class="btn back" onclick="previousStep()">Volver</button><button class="btn" onclick="saveLote()">Validar lote</button></div>`;
   }
 
   if(step===4){
@@ -90,7 +98,7 @@ function renderStep(){
       <div>${state.vins.map((v,i)=>`<span class="chip">${v}<button onclick="removeVin(${i})">×</button></span>`).join("") || '<p class="small">Sin VIN cargados.</p>'}</div>
       <label>Observación general</label>
       <textarea id="obs">${state.obs || "Sin observaciones"}</textarea>
-      <button class="btn" onclick="saveUnits()">Continuar</button>`;
+      <div class="stepActions"><button class="btn back" onclick="previousStep()">Volver</button><button class="btn" onclick="saveUnits()">Continuar</button></div>`;
   }
 
   if(step===5){
@@ -98,9 +106,42 @@ function renderStep(){
     const msg = buildMessage(false);
     $("stepContent").innerHTML=`
       <div class="summary">${escapeHtml(msg)}</div>
-      <button class="btn" onclick="sendWhatsapp()">Enviar por WhatsApp</button>
-      <button class="btn light" onclick="step=1;renderStep()">Volver al inicio</button>`;
+      <button class="btn" onclick="sendWhatsapp()">Enviar por WhatsApp</button>\n      <div class="stepActions"><button class="btn back" onclick="previousStep()">Volver</button><button class="btn light" onclick="step=1;renderStep()">Inicio</button></div>`;
   }
+}
+
+function destinoCodigo(nombre){
+  const m = String(nombre || "").match(/(?:Código|Codigo|Cod|Cód)[:\s.-]*([A-Za-z0-9-]+)/i);
+  return m ? m[1] : "";
+}
+
+function destinoZona(nombre){
+  const parts = String(nombre || "").split(/\s+-\s+|\s+·\s+/).map(x=>x.trim()).filter(Boolean);
+  if(parts.length >= 2) return parts.slice(1).join(" · ");
+  return "";
+}
+
+function destinoNombrePrincipal(nombre){
+  const parts = String(nombre || "").split(/\s+-\s+|\s+·\s+/).map(x=>x.trim()).filter(Boolean);
+  return parts[0] || String(nombre || "");
+}
+
+function renderDestinoEntrega(){
+  if(!state.destino) return "";
+  const nombre = destinoNombrePrincipal(state.destino.name);
+  const zona = destinoZona(state.destino.name);
+  const codigo = destinoCodigo(state.destino.name);
+  const codigoTxt = codigo ? `Código: ${codigo}` : "";
+  const zonaTxt = zona ? `${codigoTxt ? " · " : ""}${zona}` : "";
+  const meta = `${codigoTxt}${zonaTxt}`;
+  const distancia = state.destino.km != null ? `Distancia aprox.: ${Number(state.destino.km).toFixed(1)} km` : "";
+  return `
+    <div class="destinoEntregaCard">
+      <div class="destLabel">Destino de entrega seleccionado:</div>
+      <div class="destName">${nombre}</div>
+      <div class="destMeta">${meta}</div>
+      <div class="destMeta">${distancia}</div>
+    </div>`;
 }
 
 function validateUserAndNext(){
