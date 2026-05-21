@@ -37,12 +37,14 @@ function renderStep(){
   if(step===1){
     $("stepTitle").innerText="Entrega";
     $("stepContent").innerHTML=`
-      <div class="statgrid">
-        <div class="stat">
-          <div class="compactInfo">
-            Flota: <b>${u.fleet || "Sin flota"}</b><br>
-            Chofer: <b>${u.driver || "Sin chofer"}</b>
-          </div>
+      <div class="userLine">
+        <div class="userBox">
+          <span>Flota</span>
+          <b>${u.fleet || "Sin flota"}</b>
+        </div>
+        <div class="userBox">
+          <span>Chofer</span>
+          <b>${u.driver || "Sin chofer"}</b>
         </div>
       </div>
       <p class="stepHint">Validar que la flota y el chofer sean correctos antes de registrar la entrega.</p>
