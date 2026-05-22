@@ -1,17 +1,9 @@
-function cleanText(v){
-  const s = String(v || "").trim();
-  if(!s || s.toLowerCase() === "null" || s.toLowerCase() === "undefined") return "";
-  return s;
-}
-
 
 function destinoDireccionCompleta(destino){
   if(!destino) return "";
-  const address = cleanText(destino.address);
-  const calle = cleanText(destino.calle);
-  if(address) return address;
-  if(calle) return calle;
-  const parts = String(destino.name || "").split(/\s+-\s+|\s+·\s+/).map(x=>cleanText(x)).filter(Boolean);
+  if(destino.address) return destino.address;
+  if(destino.calle) return destino.calle;
+  const parts = String(destino.name || "").split(/\s+-\s+|\s+·\s+/).map(x=>x.trim()).filter(Boolean);
   return parts.length > 1 ? parts.slice(1).join(" · ") : "";
 }
 
@@ -256,7 +248,6 @@ function saveUnits(){
 
 function buildMessage(finalize){
   const u=user(), gps=state.gps, id=regId();
-  const direccionDestino = state.destino ? destinoDireccionCompleta(state.destino) : "";
   const unidades = state.vins.length ? "VIN informados:\n"+state.vins.map(v=>"- "+v).join("\n") : "Informado solo con lote.";
   const msg = `ELTA - Registro de Entrega de unidades
 N° registro: ${id}
@@ -264,8 +255,8 @@ Chofer: ${u.driver}
 Flota: ${u.fleet}
 Fecha entrega: ${gps ? fmtDate(gps.time) : fmtDate(new Date())}
 Lote: ${state.lote}
-Destino: ${state.destino ? state.destino.name : ""}
-${direccionDestino ? "Dirección destino: " + direccionDestino + "\n" : ""}GPS: ${gps ? gps.lat.toFixed(6)+", "+gps.lng.toFixed(6)+" · Fecha/hora: "+fmtDate(gps.time) : ""}
+Destino: ${state.destino ? state.destino.name : ""}\nDirección destino: ${state.destino ? destinoDireccionCompleta(state.destino) : ""}\nCalle destino: ${state.destino ? destinoCalle(state.destino) : ""}
+GPS: ${gps ? gps.lat.toFixed(6)+", "+gps.lng.toFixed(6)+" · Fecha/hora: "+fmtDate(gps.time) : ""}
 ${unidades}
 Observación general: ${state.obs || "Sin observaciones"}`;
   if(finalize) save(LS.last,{msg, date:new Date().toISOString()});
