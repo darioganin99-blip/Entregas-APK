@@ -42,7 +42,6 @@ function renderStep(){
   const u = user();
 
   if(step===1){
-    $("stepTitle").innerText="Paso 1";
     $("stepContent").innerHTML=`
       <div class="unifiedUserBox">
         <b>${(u.fleet || "Sin flota") + " " + (u.driver || "Sin chofer")}</b>
