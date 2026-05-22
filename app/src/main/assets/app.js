@@ -49,8 +49,12 @@ function show(id){
 }
 
 function setProgress(){
-$("stepPillText").innerText = "Paso " + step + " de 5";
-  for(let i=2;i<=5;i++) $("p"+i).classList.toggle("on", step>=i);
+  const pill = $("stepPillText");
+  if(pill) pill.innerText = "Paso " + step + " de 5";
+  for(let i=2;i<=5;i++){
+    const el = $("p"+i);
+    if(el) el.classList.toggle("on", step>=i);
+  }
 }
 
 function renderStep(){
