@@ -1,4 +1,13 @@
 
+function destinoDireccionCompleta(destino){
+  if(!destino) return "";
+  if(destino.address) return destino.address;
+  if(destino.calle) return destino.calle;
+  const parts = String(destino.name || "").split(/\s+-\s+|\s+·\s+/).map(x=>x.trim()).filter(Boolean);
+  return parts.length > 1 ? parts.slice(1).join(" · ") : "";
+}
+
+
 const $ = id => document.getElementById(id);
 const LS = { user:"elta_user", last:"elta_last_record" };
 let step = 1;
@@ -33,7 +42,7 @@ function show(id){
 }
 
 function setProgress(){
-  $("stepNum").innerText = step;
+  $("stepNum").innerText = " " + step + " ";
   for(let i=2;i<=5;i++) $("p"+i).classList.toggle("on", step>=i);
 }
 
@@ -137,7 +146,7 @@ function destinoNombrePrincipal(nombre){
 function renderDestinoEntrega(){
   if(!state.destino) return "";
   const nombre = destinoNombrePrincipal(state.destino.name);
-  const calle = destinoCalle(state.destino);
+  const direccion = destinoDireccionCompleta(state.destino);
   const zona = destinoZona(state.destino.name);
   const codigo = state.destino.code || destinoCodigo(state.destino.name);
   const codigoTxt = codigo ? `Código: ${codigo}` : "";
@@ -148,7 +157,7 @@ function renderDestinoEntrega(){
     <div class="destinoEntregaCard">
       <div class="destLabel">Destino de entrega seleccionado:</div>
       <div class="destName">${nombre}</div>
-      ${calle ? `<div class="destStreet">Calle: ${calle}</div>` : ""}
+      ${direccion ? `<div class="destStreet">${direccion}</div>` : ""}
       <div class="destMeta">${meta}</div>
       <div class="destMeta">${distancia}</div>
     </div>`;
