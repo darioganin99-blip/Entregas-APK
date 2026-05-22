@@ -71,7 +71,7 @@ function renderStep(){
       <label>Fecha y hora</label>
       <input readonly value="${gps ? fmtDate(gps.time) : ""}" placeholder="Se registra al validar GPS">
       <label>GPS</label>
-      <input readonly value="${gps ? gps.lat.toFixed(6)+', '+gps.lng.toFixed(6)+' · precisión '+Math.round(gps.acc)+' m' : ""}" placeholder="Sin GPS">
+    <input readonly value="${gps ? gps.lat.toFixed(6)+', '+gps.lng.toFixed(6) : ""}"
       <button class="btn secondary" onclick="getGps()">Validar ubicación con GPS</button>
       ${renderDestinoEntrega()}
       <label>Cambiar destino de entrega</label>
