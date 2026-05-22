@@ -1,5 +1,6 @@
 package com.elta.entregas;
 
+import android.content.pm.PackageManager;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
