@@ -71,7 +71,7 @@ function renderStep(){
       <label>Fecha y hora</label>
       <input readonly value="${gps ? fmtDate(gps.time) : ""}" placeholder="Se registra al validar GPS">
       <label>GPS</label>
-      <input readonly value="${gps ? gps.lat.toFixed(6)+', '+gps.lng.toFixed(6)+' · precisión '+Math.round(gps.acc)+' m' : ""}" placeholder="Sin GPS">
+      <input readonly value="${gps ? gps.lat.toFixed(6)+', '+gps.lng.toFixed(6) : ""}" placeholder="Sin GPS">
       <button class="btn secondary" onclick="getGps()">Validar ubicación con GPS</button>
       ${renderDestinoEntrega()}
       <label>Cambiar destino de entrega</label>
@@ -256,7 +256,7 @@ Flota: ${u.fleet}
 Fecha entrega: ${gps ? fmtDate(gps.time) : fmtDate(new Date())}
 Lote: ${state.lote}
 Destino: ${state.destino ? state.destino.name : ""}\nDirección destino: ${state.destino ? destinoDireccionCompleta(state.destino) : ""}\nCalle destino: ${state.destino ? destinoCalle(state.destino) : ""}
-GPS: ${gps ? gps.lat.toFixed(6)+", "+gps.lng.toFixed(6)+" · precisión "+Math.round(gps.acc)+" m · Fecha/hora: "+fmtDate(gps.time) : ""}
+GPS: ${gps ? gps.lat.toFixed(6)+", "+gps.lng.toFixed(6)+" · Fecha/hora: "+fmtDate(gps.time) : ""}
 ${unidades}
 Observación general: ${state.obs || "Sin observaciones"}`;
   if(finalize) save(LS.last,{msg, date:new Date().toISOString()});
