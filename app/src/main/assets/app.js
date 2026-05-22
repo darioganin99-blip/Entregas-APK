@@ -49,7 +49,7 @@ function show(id){
 }
 
 function setProgress(){
-  $("stepNum").innerText = String(step);
+$("stepPillText").innerText = "Paso " + step + " de 5";
   for(let i=2;i<=5;i++) $("p"+i).classList.toggle("on", step>=i);
 }
 
