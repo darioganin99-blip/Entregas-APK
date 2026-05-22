@@ -110,6 +110,14 @@ function renderStep(){
   }
 }
 
+function destinoCalle(destino){
+  if(!destino) return "";
+  if(destino.calle) return destino.calle;
+  if(destino.address) return destino.address;
+  const parts = String(destino.name || "").split(/\s+-\s+|\s+·\s+/).map(x=>x.trim()).filter(Boolean);
+  return parts.length > 1 ? parts.slice(1).join(" · ") : "";
+}
+
 function destinoCodigo(nombre){
   const m = String(nombre || "").match(/(?:Código|Codigo|Cod|Cód)[:\s.-]*([A-Za-z0-9-]+)/i);
   return m ? m[1] : "";
@@ -129,8 +137,9 @@ function destinoNombrePrincipal(nombre){
 function renderDestinoEntrega(){
   if(!state.destino) return "";
   const nombre = destinoNombrePrincipal(state.destino.name);
+  const calle = destinoCalle(state.destino);
   const zona = destinoZona(state.destino.name);
-  const codigo = destinoCodigo(state.destino.name);
+  const codigo = state.destino.code || destinoCodigo(state.destino.name);
   const codigoTxt = codigo ? `Código: ${codigo}` : "";
   const zonaTxt = zona ? `${codigoTxt ? " · " : ""}${zona}` : "";
   const meta = `${codigoTxt}${zonaTxt}`;
@@ -139,6 +148,7 @@ function renderDestinoEntrega(){
     <div class="destinoEntregaCard">
       <div class="destLabel">Destino de entrega seleccionado:</div>
       <div class="destName">${nombre}</div>
+      ${calle ? `<div class="destStreet">Calle: ${calle}</div>` : ""}
       <div class="destMeta">${meta}</div>
       <div class="destMeta">${distancia}</div>
     </div>`;
@@ -236,7 +246,7 @@ Chofer: ${u.driver}
 Flota: ${u.fleet}
 Fecha entrega: ${gps ? fmtDate(gps.time) : fmtDate(new Date())}
 Lote: ${state.lote}
-Destino: ${state.destino ? state.destino.name : ""}
+Destino: ${state.destino ? state.destino.name : ""}\nCalle destino: ${state.destino ? destinoCalle(state.destino) : ""}
 GPS: ${gps ? gps.lat.toFixed(6)+", "+gps.lng.toFixed(6)+" · precisión "+Math.round(gps.acc)+" m · Fecha/hora: "+fmtDate(gps.time) : ""}
 ${unidades}
 Observación general: ${state.obs || "Sin observaciones"}`;
