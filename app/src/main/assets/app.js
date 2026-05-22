@@ -42,7 +42,7 @@ function show(id){
 }
 
 function setProgress(){
-  $("stepNum").innerText = String(step);
+  $("stepNum").innerText = step;
   for(let i=2;i<=5;i++) $("p"+i).classList.toggle("on", step>=i);
 }
 
@@ -256,7 +256,7 @@ Flota: ${u.fleet}
 Fecha entrega: ${gps ? fmtDate(gps.time) : fmtDate(new Date())}
 Lote: ${state.lote}
 Destino: ${state.destino ? state.destino.name : ""}\nDirección destino: ${state.destino ? destinoDireccionCompleta(state.destino) : ""}\nCalle destino: ${state.destino ? destinoCalle(state.destino) : ""}
-GPS: ${gps ? gps.lat.toFixed(6)+", "+gps.lng.toFixed(6)+" · Fecha/hora: "+fmtDate(gps.time) : ""}
+GPS: ${gps ? gps.lat.toFixed(6)+", "+gps.lng.toFixed(6) : ""}
 ${unidades}
 Observación general: ${state.obs || "Sin observaciones"}`;
   if(finalize) save(LS.last,{msg, date:new Date().toISOString()});
