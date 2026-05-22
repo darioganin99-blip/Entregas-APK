@@ -1,6 +1,5 @@
-# Cambios versión 2.3
+# Versión 2.3
 
-- Eliminada fecha y hora después del GPS en WhatsApp.
-- Corregidos espacios en Paso 1 de 5, Paso 2 de 5, etc.
-- Agregada dirección/calle del destino seleccionado.
+- Partida desde el ZIP subido por el usuario.
+- Se quitó fecha/hora después del GPS en el mensaje de WhatsApp.
 - Versión actualizada a 2.3.
