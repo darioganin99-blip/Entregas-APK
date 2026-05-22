@@ -310,19 +310,112 @@ function saveUser(){
   $("userMsg").innerHTML='<span class="ok">Usuario guardado correctamente.</span>';
 }
 
-function startScanner(target){
-  const box=$("scannerBox"), video=$("video");
-  if(!navigator.mediaDevices){ alert("Cámara no disponible."); return; }
+
+
+
+
+
+let scanTarget = "";
+let barcodeDetector = null;
+let scanLoopActive = false;
+
+async function startScanner(target){
+  scanTarget = target;
+  const box = $("scannerBox");
+  const video = $("video");
+
+  if(!box || !video){
+    alert("No se encontró el visor de cámara.");
+    return;
+  }
+
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    alert("Cámara no disponible en este dispositivo.");
+    return;
+  }
+
   box.classList.remove("hidden");
-  navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}}).then(stream=>{
-    currentScanStream=stream; video.srcObject=stream; video.play();
-    alert("Cámara abierta. En esta versión se permite lectura visual; si el lector automático no está disponible, ingresá el dato manualmente.");
-  }).catch(e=>alert("No se pudo abrir cámara: "+e.message));
+
+  try{
+    currentScanStream = await navigator.mediaDevices.getUserMedia({
+      video:{ facingMode:{ ideal:"environment" } },
+      audio:false
+    });
+
+    video.srcObject = currentScanStream;
+    video.setAttribute("playsinline", "true");
+    await video.play();
+
+    if("BarcodeDetector" in window){
+      barcodeDetector = new BarcodeDetector({
+        formats:[
+          "code_128","code_39","code_93","ean_13","ean_8",
+          "upc_a","upc_e","itf","codabar","qr_code","data_matrix","pdf417"
+        ]
+      });
+      scanLoopActive = true;
+      scanBarcodeLoop();
+    }else{
+      alert("La cámara abrió, pero este WebView no soporta lector automático de códigos. Ingresá el dato manualmente.");
+    }
+  }catch(e){
+    alert("No se pudo abrir la cámara: " + e.message);
+  }
+}
+
+async function scanBarcodeLoop(){
+  const video = $("video");
+  if(!scanLoopActive || !barcodeDetector || !video) return;
+
+  try{
+    if(video.readyState >= 2){
+      const codes = await barcodeDetector.detect(video);
+      if(codes && codes.length){
+        const value = (codes[0].rawValue || "").trim();
+        if(value){
+          applyScannedValue(value);
+          stopScanner();
+          return;
+        }
+      }
+    }
+  }catch(e){
+    console.log("Error leyendo código:", e);
+  }
+
+  requestAnimationFrame(scanBarcodeLoop);
+}
+
+function applyScannedValue(value){
+  if(scanTarget === "lote"){
+    const input = $("lote");
+    if(input) input.value = value;
+    state.lote = value;
+  }
+
+  if(scanTarget === "vin"){
+    const input = $("vin");
+    if(input) input.value = value;
+  }
 }
 
 function stopScanner(){
-  if(currentScanStream){ currentScanStream.getTracks().forEach(t=>t.stop()); currentScanStream=null; }
-  const box=$("scannerBox"); if(box) box.classList.add("hidden");
+  scanLoopActive = false;
+  barcodeDetector = null;
+
+  if(currentScanStream){
+    currentScanStream.getTracks().forEach(t=>t.stop());
+    currentScanStream = null;
+  }
+
+  const video = $("video");
+  if(video){
+    video.pause();
+    video.srcObject = null;
+  }
+
+  const box = $("scannerBox");
+  if(box) box.classList.add("hidden");
 }
 
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m])); }
