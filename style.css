@@ -255,33 +255,3 @@ video{width:100%;border-radius:18px;background:#000;margin-top:12px}
   margin-top:4px !important;
   line-height:1.25 !important;
 }
-
-
-.stepPill{
-  display:inline-flex !important;
-  align-items:center !important;
-  gap:4px !important;
-  white-space:nowrap !important;
-  font-kerning:none !important;
-  letter-spacing:0 !important;
-  word-spacing:0 !important;
-}
-
-
-/* V2.3 corregida - pasos sin espacios extra */
-.stepPill{
-  display:inline-flex !important;
-  align-items:center !important;
-  gap:0 !important;
-  white-space:nowrap !important;
-  letter-spacing:0 !important;
-  word-spacing:0 !important;
-}
-.stepPill #stepNum{
-  display:inline !important;
-  min-width:0 !important;
-  margin:0 4px !important;
-  padding:0 !important;
-}
-
-.stepPill{display:none !important;}
