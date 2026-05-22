@@ -255,3 +255,18 @@ video{width:100%;border-radius:18px;background:#000;margin-top:12px}
   margin-top:4px !important;
   line-height:1.25 !important;
 }
+
+
+.stepPill{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:0 !important;
+  letter-spacing:0 !important;
+  word-spacing:0 !important;
+  white-space:nowrap !important;
+}
+.stepPill #stepNum{
+  margin:0 !important;
+  padding:0 !important;
+  min-width:auto !important;
+}
