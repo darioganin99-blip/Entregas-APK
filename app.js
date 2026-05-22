@@ -42,7 +42,7 @@ function show(id){
 }
 
 function setProgress(){
-  $("stepNum").innerText = " " + step + " ";
+  $("stepNum").innerText = String(step);
   for(let i=2;i<=5;i++) $("p"+i).classList.toggle("on", step>=i);
 }
 
@@ -157,7 +157,7 @@ function renderDestinoEntrega(){
     <div class="destinoEntregaCard">
       <div class="destLabel">Destino de entrega seleccionado:</div>
       <div class="destName">${nombre}</div>
-      ${direccion ? `<div class="destStreet">${direccion}</div>` : ""}
+      ${direccion ? `<div class="destStreet">Dirección: ${direccion}</div>` : ""}
       <div class="destMeta">${meta}</div>
       <div class="destMeta">${distancia}</div>
     </div>`;
@@ -255,7 +255,7 @@ Chofer: ${u.driver}
 Flota: ${u.fleet}
 Fecha entrega: ${gps ? fmtDate(gps.time) : fmtDate(new Date())}
 Lote: ${state.lote}
-Destino: ${state.destino ? state.destino.name : ""}\nCalle destino: ${state.destino ? destinoCalle(state.destino) : ""}
+Destino: ${state.destino ? state.destino.name : ""}\nDirección destino: ${state.destino ? destinoDireccionCompleta(state.destino) : ""}\nCalle destino: ${state.destino ? destinoCalle(state.destino) : ""}
 GPS: ${gps ? gps.lat.toFixed(6)+", "+gps.lng.toFixed(6)+" · precisión "+Math.round(gps.acc)+" m · Fecha/hora: "+fmtDate(gps.time) : ""}
 ${unidades}
 Observación general: ${state.obs || "Sin observaciones"}`;

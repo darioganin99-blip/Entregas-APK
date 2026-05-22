@@ -231,3 +231,27 @@ video{width:100%;border-radius:18px;background:#000;margin-top:12px}
 }
 
 .stepPill{letter-spacing:0.2px;word-spacing:3px;}
+
+
+/* V2.1 - correcciones visuales */
+.stepPill{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:6px !important;
+  white-space:nowrap !important;
+  letter-spacing:0 !important;
+  word-spacing:normal !important;
+}
+.stepPill #stepNum{
+  display:inline-block !important;
+  min-width:18px !important;
+  text-align:center !important;
+}
+.destStreet,
+.destAddress{
+  font-size:16px !important;
+  font-weight:700 !important;
+  color:#2E7D32 !important;
+  margin-top:4px !important;
+  line-height:1.25 !important;
+}
