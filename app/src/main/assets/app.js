@@ -50,8 +50,12 @@ function show(id){
 }
 
 function setProgress(){
-  $("stepNum").innerText = String(step);
-  for(let i=2;i<=5;i++) $("p"+i).classList.toggle("on", step>=i);
+  const stepNumEl = $("stepNum");
+  if(stepNumEl) stepNumEl.innerText = String(step);
+  for(let i=2;i<=5;i++){
+    const el = $("p"+i);
+    if(el) el.classList.toggle("on", step>=i);
+  }
 }
 
 function renderStep(){
